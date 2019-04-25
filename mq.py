@@ -27,7 +27,7 @@ class MQ():
     GAS_SMOKE                    = 2
 
     def __init__(self, Ro=10, analogPin=0):
-        self.Ro = Ro
+        self.Ro = abs(Ro)
         self.MQ_PIN = analogPin
         self.adc = MCP3008()
         
@@ -45,7 +45,7 @@ class MQ():
                                             # data format:[ x, y, slope]; point1: (lg200, 0.53), point2: (lg10000,  -0.22)  
                 
         print("Calibrating...")
-        self.Ro = self.MQCalibration(self.MQ_PIN)
+        self.Ro = abs(self.MQCalibration(self.MQ_PIN))
         print("Calibration is done...\n")
         print("Ro=%f kohm" % self.Ro)
     
@@ -53,9 +53,9 @@ class MQ():
     def MQPercentage(self):
         val = {}
         read = self.MQRead(self.MQ_PIN)
-        val["GAS_LPG"]  = self.MQGetGasPercentage(read/self.Ro, self.GAS_LPG)
-        val["CO"]       = self.MQGetGasPercentage(read/self.Ro, self.GAS_CO)
-        val["SMOKE"]    = self.MQGetGasPercentage(read/self.Ro, self.GAS_SMOKE)
+        val["GAS_LPG"]  = self.MQGetGasPercentage(abs(read/self.Ro), abs(self.GAS_LPG))
+        val["CO"]       = self.MQGetGasPercentage(abs(read/self.Ro), abs(self.GAS_CO))
+        val["SMOKE"]    = self.MQGetGasPercentage(abs(read/self.Ro), abs(self.GAS_SMOKE))
         return val
         
     ######################### MQResistanceCalculation #########################
@@ -119,11 +119,11 @@ class MQ():
     ############################################################################ 
     def MQGetGasPercentage(self, rs_ro_ratio, gas_id):
         if ( gas_id == self.GAS_LPG ):
-            return self.MQGetPercentage(rs_ro_ratio, self.LPGCurve)
+            return abs(self.MQGetPercentage(rs_ro_ratio, self.LPGCurve))
         elif ( gas_id == self.GAS_CO ):
-            return self.MQGetPercentage(rs_ro_ratio, self.COCurve)
+            return abs(self.MQGetPercentage(rs_ro_ratio, self.COCurve))
         elif ( gas_id == self.GAS_SMOKE ):
-            return self.MQGetPercentage(rs_ro_ratio, self.SmokeCurve)
+            return abs(self.MQGetPercentage(rs_ro_ratio, self.SmokeCurve))
         return 0
      
     #########################  MQGetPercentage #################################
@@ -136,5 +136,5 @@ class MQ():
     #          value.
     ############################################################################ 
     def MQGetPercentage(self, rs_ro_ratio, pcurve):
-        return (math.pow(10,( ((math.log(rs_ro_ratio)-pcurve[1])/ pcurve[2]) + pcurve[0])))
+        return (math.pow(10,( ((math.log10(rs_ro_ratio)-pcurve[1])/ pcurve[2]) + pcurve[0])))
 
