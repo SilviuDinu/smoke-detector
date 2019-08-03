@@ -8,7 +8,7 @@ server.connect("smtp.gmail.com",587)
 server.ehlo()
 server.starttls()
 server.ehlo()
-server.login("silviualex626@gmail.com","162534Naruto12.")
+server.login("","")
 
 msg = "Atentie!!! Gaze inflamabile sau fum au fost detectate de catre sistem"
 GPIO.setmode(GPIO.BCM)
